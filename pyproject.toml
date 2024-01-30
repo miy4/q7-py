@@ -1,0 +1,40 @@
+[project]
+name = "q7-py"
+version = "0.1.0"
+description = 'A simple text editor inspired by "Build Your Own Text Editor" by Salvatore Sanfilippo'
+authors = [
+    { name = "miy4", email = "miy4@users.noreply.github.com" }
+]
+dependencies = []
+readme = "README.md"
+requires-python = ">= 3.8"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.rye]
+managed = true
+dev-dependencies = []
+
+[tool.rye.scripts]
+q7 = { call = "q7_py" }
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/q7_py"]
+
+[tool.ruff]
+line-length = 100
+indent-width = 4
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = ["EXE", "T20", "E501", "D203", "D212", "ANN101", "S311"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
