@@ -18,7 +18,8 @@ class RawMode:
         raw_mode = termios.tcgetattr(stdin_fileno)
         self.orig_attr = raw_mode[:]
 
-        lflag = 3
+        iflag, lflag = 0, 3
+        raw_mode[iflag] &= ~(termios.IXON)
         raw_mode[lflag] &= ~(termios.ECHO | termios.ICANON | termios.ISIG)
 
         termios.tcsetattr(stdin_fileno, termios.TCSAFLUSH, raw_mode)
