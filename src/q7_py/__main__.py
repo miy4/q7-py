@@ -20,7 +20,7 @@ class RawMode:
 
         iflag, lflag = 0, 3
         raw_mode[iflag] &= ~(termios.IXON)
-        raw_mode[lflag] &= ~(termios.ECHO | termios.ICANON | termios.ISIG)
+        raw_mode[lflag] &= ~(termios.ECHO | termios.ICANON | termios.ISIG | termios.IEXTEN)
 
         termios.tcsetattr(stdin_fileno, termios.TCSAFLUSH, raw_mode)
 
