@@ -18,8 +18,9 @@ class RawMode:
         raw_mode = termios.tcgetattr(stdin_fileno)
         self.orig_attr = raw_mode[:]
 
-        iflag, lflag = 0, 3
+        iflag, oflag, lflag = 0, 1, 3
         raw_mode[iflag] &= ~(termios.IXON | termios.ICRNL)
+        raw_mode[oflag] &= ~(termios.OPOST)
         raw_mode[lflag] &= ~(termios.ECHO | termios.ICANON | termios.ISIG | termios.IEXTEN)
 
         termios.tcsetattr(stdin_fileno, termios.TCSAFLUSH, raw_mode)
@@ -36,9 +37,9 @@ def main() -> None:
         while (b := sys.stdin.buffer.read(1)) != b"q":
             rune = b[0]
             if chr(rune) in STRING_PRINTABLE:
-                print(f"{rune} ('{chr(rune)}')")
+                print(f"{rune} ('{chr(rune)}')", end="\r\n")
             else:
-                print(f"{rune}")
+                print(f"{rune}", end="\r\n")
 
     finally:
         raw_mode.disable()
