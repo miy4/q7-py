@@ -1,21 +1,39 @@
+from __future__ import annotations
+
 import sys
 import termios
 
 
-def enable_raw_mode() -> None:
-    stdin_fileno = sys.stdin.fileno()
-    raw_mode = termios.tcgetattr(stdin_fileno)
-    lflag = 3
-    raw_mode[lflag] &= ~termios.ECHO
+class RawMode:
+    orig_attr: list[int | bytes]
 
-    termios.tcsetattr(stdin_fileno, termios.TCSAFLUSH, raw_mode)
+    def __init__(self) -> None:
+        self.orig_attr = []
+
+    def enable(self) -> None:
+        stdin_fileno = sys.stdin.fileno()
+        raw_mode = termios.tcgetattr(stdin_fileno)
+        self.orig_attr = raw_mode[:]
+
+        lflag = 3
+        raw_mode[lflag] &= ~termios.ECHO
+
+        termios.tcsetattr(stdin_fileno, termios.TCSAFLUSH, raw_mode)
+
+    def disable(self) -> None:
+        if self.orig_attr:
+            termios.tcsetattr(sys.stdin.fileno(), termios.TCSAFLUSH, self.orig_attr)
 
 
 def main() -> None:
-    enable_raw_mode()
+    raw_mode = RawMode()
+    try:
+        raw_mode.enable()
+        while sys.stdin.buffer.read(1) != b"q":
+            pass
+    finally:
+        raw_mode.disable()
 
-    while sys.stdin.buffer.read(1) != b"q":
-        pass
     sys.exit(0)
 
 
