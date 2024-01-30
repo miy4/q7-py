@@ -1,7 +1,10 @@
 from __future__ import annotations
 
+import string
 import sys
 import termios
+
+STRING_PRINTABLE = string.ascii_letters + string.digits + string.punctuation
 
 
 class RawMode:
@@ -29,8 +32,13 @@ def main() -> None:
     raw_mode = RawMode()
     try:
         raw_mode.enable()
-        while sys.stdin.buffer.read(1) != b"q":
-            pass
+        while (b := sys.stdin.buffer.read(1)) != b"q":
+            rune = b[0]
+            if chr(rune) in STRING_PRINTABLE:
+                print(f"{rune} ('{chr(rune)}')")
+            else:
+                print(f"{rune}")
+
     finally:
         raw_mode.disable()
 
