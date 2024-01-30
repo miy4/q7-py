@@ -2,7 +2,7 @@ import sys
 
 
 def main() -> None:
-    while sys.stdin.buffer.read(1):
+    while sys.stdin.buffer.read(1) != b"q":
         pass
 
     sys.exit(0)
