@@ -37,7 +37,7 @@ class RawMode:
             termios.tcsetattr(sys.stdin.fileno(), termios.TCSAFLUSH, self.orig_attr)
 
 
-def main() -> None:
+def run() -> int:
     raw_mode = RawMode()
     try:
         raw_mode.enable()
@@ -51,10 +51,17 @@ def main() -> None:
 
             if b == b"q":
                 break
+    except Exception as e:
+        print(f"Error: {e}", file=sys.stderr)
+        return 1
     finally:
         raw_mode.disable()
 
-    sys.exit(0)
+    return 0
+
+
+def main() -> None:
+    sys.exit(run())
 
 
 if __name__ == "__main__":
