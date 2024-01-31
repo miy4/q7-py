@@ -16,15 +16,19 @@ class RawMode:
     def enable(self) -> None:
         stdin_fileno = sys.stdin.fileno()
         raw_mode = termios.tcgetattr(stdin_fileno)
-        self.orig_attr = raw_mode[:]
 
-        iflag, oflag, cflag, lflag = 0, 1, 2, 3
+        iflag, oflag, cflag, lflag, cc = 0, 1, 2, 3, 6
+        self.orig_attr = raw_mode[:]
+        self.orig_attr[cc] = raw_mode[cc][:]
+
         raw_mode[iflag] &= ~(
             termios.IXON | termios.ICRNL | termios.BRKINT | termios.INPCK | termios.ISTRIP
         )
         raw_mode[oflag] &= ~(termios.OPOST)
         raw_mode[cflag] |= termios.CS8
         raw_mode[lflag] &= ~(termios.ECHO | termios.ICANON | termios.ISIG | termios.IEXTEN)
+        raw_mode[cc][termios.VMIN] = 0
+        raw_mode[cc][termios.VTIME] = 1
 
         termios.tcsetattr(stdin_fileno, termios.TCSAFLUSH, raw_mode)
 
@@ -37,13 +41,16 @@ def main() -> None:
     raw_mode = RawMode()
     try:
         raw_mode.enable()
-        while (b := sys.stdin.buffer.read(1)) != b"q":
-            rune = b[0]
+        while True:
+            b = sys.stdin.buffer.read(1)
+            rune = b[0] if b else 0
             if chr(rune) in STRING_PRINTABLE:
                 print(f"{rune} ('{chr(rune)}')", end="\r\n")
             else:
                 print(f"{rune}", end="\r\n")
 
+            if b == b"q":
+                break
     finally:
         raw_mode.disable()
 
