@@ -4,6 +4,8 @@ import string
 import sys
 import termios
 
+from . import key
+
 STRING_PRINTABLE = string.ascii_letters + string.digits + string.punctuation
 
 
@@ -49,7 +51,7 @@ def run() -> int:
             else:
                 print(f"{rune}", end="\r\n")
 
-            if b == b"q":
+            if rune == key.CTRL_Q:
                 break
     except Exception as e:
         print(f"Error: {e}", file=sys.stderr)
